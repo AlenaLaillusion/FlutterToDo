@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_provider/widgets/top_bar.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -7,7 +8,7 @@ class HomePage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Column(
         children: <Widget>[
-
+          TopBar(),
         ],),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
