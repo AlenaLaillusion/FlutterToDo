@@ -1,7 +1,15 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_provider/bloc/PriceState.dart';
+import 'package:flutter_provider/bloc/PriceState.dart';
+import 'package:flutter_provider/domain/ApiCoinsRepository.dart';
 import 'package:flutter_provider/pages/home_page.dart';
 import 'package:provider/provider.dart';
 
+import 'bloc/PriceBloc.dart';
+import 'bloc/PriceEvent.dart';
+import 'bloc/PriceState.dart';
 import 'models/data.dart';
 
 void main() {
@@ -41,7 +49,7 @@ class HomePagge extends StatelessWidget {
         title: Container(child: Text(context.watch<Data>().getData)),
       ),
       body: Center(
-        child: Widget1(),
+        child: LineChartWidget(),
       ),
     );
   }
@@ -92,4 +100,56 @@ class MyTextFiled extends StatelessWidget {
     );
   }
 }
+
+class LineChartWidget extends StatelessWidget {
+  final List<Color> gradientColors = [
+    const Color(0xff23b6e6),
+    const Color(0xff02d39a)
+  ];
+  final coinRepository = ApiCoinsRepository();
+
+  @override
+  Widget build(BuildContext context) {
+
+    return BlocProvider(
+        create: (BuildContext context) {
+      return PriceBloc(coinRepository);
+    },
+    child: BlocBuilder<PriceBloc, PriceState> (
+        builder: (context, state){
+
+          switch (state.state) {
+            case ProfileStatus.start:
+            context.read<PriceBloc>().add(CreateProfile());
+            return Center(child: CircularProgressIndicator(),
+            );
+
+            case ProfileStatus.loaded:
+              print(state.priceList.first.prices);
+              print(DateTime.fromMillisecondsSinceEpoch((1628427685723 * 0.001).toInt()));
+              return Container(
+                  child: LineChart(
+                    LineChartData(
+                        lineBarsData: [
+                        LineChartBarData(
+                        spots: [
+                        FlSpot(state.priceList.first.prices[26][0], state.priceList.first.prices[26][1]),
+                        FlSpot(state.priceList.first.prices[12][0], state.priceList.first.prices[12][1]),
+                        FlSpot(state.priceList.first.prices[6][0], state.priceList.first.prices[6][1]),
+                        FlSpot(state.priceList.first.prices[3][0], state.priceList.first.prices[3][1]),
+                        FlSpot(state.priceList.first.prices[1][0], state.priceList.first.prices[1][1]),
+                    ],
+                  ),
+                  ]
+              ),
+          ),
+              );
+          }
+          return Text('No');
+        },
+      )
+    );
+  }
+}
+
 
